@@ -27,7 +27,7 @@
 
 #title[notation hell :]
 
-= Linalg
+= Intro
 == Basic Notation
 
 _Position vector_ (point): $P = vec(P_x, P_y, P_z)$.\
@@ -170,7 +170,7 @@ $
 $
 
 
-= Physical Stuff
+= Terminology and Concepts
 
 == Joints
 
@@ -183,6 +183,14 @@ For revolute joints, this is the axis of rotation; for prismatic joints, this is
 The axes also have an orientation, determining the positive angle (using the right-hand corkscrew rule) or translation direction.\
 The choice of orientation is arbitrary, and usually are done to make the angle/translation signs more intuitive.
 
+== Frames
+
+A _frame_ is a local coordinate system that rigidly attaches to some object, usually a link or part of a robot.
+
+Conventionally, frame 0, notated ${0}$, is the _base_ frame of a robot, used to describe the robot's position and orientation in the world.
+Then, for a robot with $n$ joints, we have frames ${1}$ to ${n}$ rigidly attached to each link, and frame ${n}$, the _end effector_ frame, rigidly attaches to ${n-1}$ but represents the _tool center point_.
+
+= Kinematics
 == Denavit-Hartenberg Parameters (modified)
 
 In D-H convention, the transformation from one frame to another is only represented by 4 parameters;
