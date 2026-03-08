@@ -1,6 +1,9 @@
 #import "/style.typ": theme
 #show: theme
 
+#import "@preview/booktabs:0.0.4": *
+#show: booktabs-default-table-style
+
 #set math.mat(delim: "[")
 #set math.vec(delim: "[")
 
@@ -85,7 +88,7 @@ Rotation matrices are orthogonal: $attach(R, tl: B, bl: A) = attach(R, tl: A, bl
 
 Aka. XYZ-fixed-angle representation.
 
-Remember to use the right-hand-rule to figure which way is the positive angle.
+Remember to use the right-hand corkscrew rule to figure which way is the positive angle.
 
 *To finish watching Task 3.4.*
 
@@ -175,14 +178,19 @@ _Revolute_: rotation about an axis.
 
 _Prismatic_: translation along an axis.
 
-== Denavit-Hartenberg Parameters
+Both types of joints have an axis.
+For revolute joints, this is the axis of rotation; for prismatic joints, this is the axis of translation.
+The axes also have an orientation, determining the positive angle (using the right-hand corkscrew rule) or translation direction.\
+The choice of orientation is arbitrary, and usually are done to make the angle/translation signs more intuitive.
+
+== Denavit-Hartenberg Parameters (modified)
 
 In D-H convention, the transformation from one frame to another is only represented by 4 parameters;
 two degrees of freedom are removed (one translational, one rotational).\
 This works because the D-H convention *restricts* how a frame can be placed relative to its adjacent frames (in a linkage setup).
 With proper placement of frames, the convention can still capture any link geometry and model both revolute and prismatic joints.
 
-Note that this course specifically uses the #link("https://en.wikipedia.org/wiki/Denavit%E2%80%93Hartenberg_parameters#Modified_DH_parameters")[_modified_ D-H parameters], and so will all the notes below.
+*Note* that this course specifically uses the #link("https://en.wikipedia.org/wiki/Denavit%E2%80%93Hartenberg_parameters#Modified_DH_parameters")[_Modified_ D-H parameters], and so will all the notes below.
 
 === Frame Placement
 
@@ -194,38 +202,79 @@ We start with some _sensible_#note-ref(<frame-0-placement>) placement of the bas
 #pad(left: 1em)[
   Let $x_i$, $y_i$, $z_i$ be the axes of frame ${i}$ (lines in 3d space with an arrow).\
   Let $L_i$ be _link_ $i$, and $J_i$ be _joint_ $i$.\
-  Let $n_i$ be the _common normal_ between $z_(i-1)$ and $z_i$: the line perpendicular to (and intersecting) both $z_(i-1)$ and $z_i$ (and if they are parallel, any of them).
+  Let $n_i$ be the _common normal_ between $z_i$ and $z_(i+1)$: the line perpendicular to (and intersecting) both $z_i$ and $z_(i+1)$ (and if they are parallel, any such solution).
 ]
 
 Frame axis assignment:
 - $z_i$ is the axis of $J_i$ (the joint connecting $L_(i-1)$ and $L_i$)
   - for revolute, oriented so the positive angle follows the right-hand corkscrew rule
   - for prismatic, oriented in the positive direction
-- $x_i$ is the parallel to $n_i$
-  - oriented from ${i-1}$ to ${i}$
+- $x_i$ is (parallel to) $n_i$
+  - oriented from $z_i$ to $z_(i+1)$
 - $y_i$ can then be deduced uniquely
-  - oriented following the right-hand rule
+  - oriented to form a right-handed coordinate system
 
-The origin of the frame ${i}_"org"$ is of course the intersection point of the axes.
+The origin of the frame ${i}_"org"$ is of course the intersection point of $z_i$ and $x_i$.
+
+One consequential property of the placement rules is that $x_i$ intersects and is perpendicular to $z_(i+1)$ (and $z_i$).
+Also, $z_i$ collinear to the common normal between $x_(i-1)$ and $x_i$, just like how $x$ axes are to $z$ axes.
+
+==== Conventions/Tips
 
 #note(<frame-0-placement>)[
-
+  On base frame placement:\
+  While ${0}$ has some freedom in its placement ($z_0$ is unconstrained since there is no joint 0), a strategic placement can simplify the D-H parameters.
+  One common strategy is to place ${0}$ to coincide with ${1}$ when the $J_1$ is at its "home" or zero position, so that $a_0 = 0$ and $alpha_0 = 0$.
+  Another is to align $z_0$ with $z_1$ and place $x_0$ to 1. align with $x_1$ while $J_1$ is in its "home" state and 2. so ${0}_"org"$ is on the base/mount surface.
 ]
 
-Consequential properties:
-- $x_i$ is perpendicular to $z_(i-1)$
-- $x_i$ intersects $z_(i-1)$
+Reset all prismatic joints to their zero position before placing frames.
+This helps create more intuitive $d$ parameters below.
+
+End-effector frame ${n}$ placement:
+- this will often violate the D-H constraints, so one might need a generic 6-DOF transform for ${n}$
+- align $z_n$ with the end-effector's _approach_ direction (e.g. the shaft of a drill)
+- align $x_n$ with the end-effector's _lateral_ direction, if it has one (e.g. the gripping direction of a gripper)
 
 === Transformations
 
-After the frames are placed, the transformation $T_i$ from ${i-1}$ to ${i}$ can be represented by the 4 D-H parameters.
+After the frames are placed, the transformation $T_i$ from ${i-1}$ to ${i}$ can be represented by the 4 (Modified) D-H parameters:
 
-D-H parameters:
-- $d_i$: offset along $z_(i-1)$ to $n_i$
-- $theta_i$: angle from $x_(i-1)$ to $x_i$ about $z_(i-1)$
-- $a_i$: length of $n_i$ $quad$ (aka. $r_i$)
-- $alpha_i$: angle from $z_(i-1)$ to $z_i$ about $n_i$
+#table(
+  columns: 4,
+  toprule(),
+  table.header[Param][Symbol][Description][Alternative Description],
+  midrule(),
+  //
+  [Link length],
+  $a_(i-1)$,
+  [distance from $z_(i-1)$ to $z_i$ (along $x_(i-1))$],
+  $frac(style: "horizontal", abs((P_i - P_(i-1)) dot (hat(z)_(i-1) times hat(z)_i)), norm(hat(z)_(i-1) times hat(z)_i))$,
 
+  [Link twist],
+  $alpha_(i-1)$,
+  [angle from $z_(i-1)$ to $z_i$ (about $x_(i-1))$],
+  $op("atan2")((hat(z)_(i-1) times hat(z)_i) dot hat(x)_(i-1), hat(z)_(i-1) dot hat(z)_i)$,
 
+  [Joint offset], $d_i$, [distance from $x_(i-1)$ to $x_i$ along $z_i$], [displacement if prismatic joint],
 
+  [Joint angle], $theta_i$, [angle from $x_(i-1)$ to $x_i$ about $z_i$], [angle if revolute joint],
+  bottomrule(),
+)
+
+Intuitively, $a_(i-1)$ and $alpha_(i-1)$ describe the geometry of link $i$ ($z_(i-1)$ and $z_i$'s relative position), while $d_i$ and $theta_i$ describe the configuration of joint $i$ (how $L_i$ moves relative to $L_(i-1)$ by $J_i$).
+
+Additional notes:
+- $alpha$ specifically measures the angles between _projections_ of the $z$ axes onto a plane normal to $x$ (with sign given by the right-hand corkscrew rule). Same idea for $theta$
+- when the orientation of $x_i$ has multiple solutions (when $z_(i-1)$ and $z_i$ intersect or are collinear), $x_i$ is conventionally oriented to make $alpha_(i-1)$ be zero or positive
+- when the placement of $x_i$ has multiple solutions (when $z_(i-1)$ and $z_i$ are parallel), $x_i$ is conventionally placed to pass through ${i-1}_"org"$
+
+$
+  attach(T, tl: i-1, bl: i) = mat(
+    cos theta_i, -sin theta_i, 0, a_(i-1);
+    sin theta_i cos alpha_(i-1), cos theta_i cos alpha_(i-1), -sin alpha_(i-1), -d_i sin alpha_(i-1);
+    sin theta_i sin alpha_(i-1), cos theta_i sin alpha_(i-1), cos alpha_(i-1), d_i cos alpha_(i-1);
+    0, 0, 0, 1;
+  )
+$
 

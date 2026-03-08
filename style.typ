@@ -4,8 +4,8 @@
   //   size: 11pt,
   // )
 
-  set page(fill: black)
-  set text(fill: rgb(234, 223, 200))
+  // set page(fill: black)
+  // set text(fill: rgb(234, 223, 200))
   // show link: set text(fill: rgb(150, 200, 237))
 
   set par(linebreaks: "optimized", justify: true)
