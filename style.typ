@@ -26,7 +26,7 @@
     size: 9.5pt,
   )
 
-  show link: set text(fill: navy)
+  show link: set text(fill: purple)
 
   body
 }
