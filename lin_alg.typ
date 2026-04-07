@@ -4,6 +4,8 @@
 #import "@preview/booktabs:0.0.4": *
 #show: booktabs-default-table-style
 
+#set page(height: auto) // mimic page-less format
+
 #set math.mat(delim: "[")
 #set math.vec(delim: "[")
 
@@ -144,9 +146,9 @@ $
 By a slight abuse of notation, this is symbolically written as $attach(P, tl: A) = attach(T, tl: A, bl: B) attach(P, tl: B)$.
 
 The homogeneous transform matrix is invertible.
-Multiple homogeneous transforms can be trivially converted to a single transforms by computing the product of the respective matrices.
+Multiple homogeneous transforms can be trivially converted to a single transform by computing the product of their respective matrices.
 
-Because the rotation matrix is orthogonal, these transformation matrices are relatively easy to invert:
+Because the rotation matrix is #link("https://en.wikipedia.org/wiki/Orthogonal_matrix")[orthogonal], these transformation matrices are relatively easy to invert:
 $
   attach(T, tl: A, bl: B)^(-1) =
   mat(
@@ -264,9 +266,9 @@ After the frames are placed, the transformation $T_i$ from ${i-1}$ to ${i}$ can 
   [angle from $z_(i-1)$ to $z_i$ (about $x_(i-1))$],
   $op("atan2")((hat(z)_(i-1) times hat(z)_i) dot hat(x)_(i-1), hat(z)_(i-1) dot hat(z)_i)$,
 
-  [Joint offset], $d_i$, [distance from $x_(i-1)$ to $x_i$ along $z_i$], [displacement if prismatic joint],
+  [Joint offset], $d_i$, [distance from $x_(i-1)$ to $x_i$ along $z_i$], [displacement, if prismatic],
 
-  [Joint angle], $theta_i$, [angle from $x_(i-1)$ to $x_i$ about $z_i$], [angle if revolute joint],
+  [Joint angle], $theta_i$, [angle from $x_(i-1)$ to $x_i$ about $z_i$], [angle, if revolute],
   bottomrule(),
 )
 
@@ -285,4 +287,7 @@ $
     0, 0, 0, 1;
   )
 $
+
+== Inverse Kinematics
+
 
