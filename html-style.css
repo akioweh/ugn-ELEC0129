@@ -1,0 +1,170 @@
+/* --body-font and --code-font are injected by style.typ as the primary
+   family names (single source of truth). Fallbacks are appended in the
+   font-family declarations below. */
+:root {
+  --content-width: 760px;
+  --sidebar-width: 280px;
+  --sidebar-gap: 2rem;
+  --link: #6a1b9a;
+  --rule: #ddd;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--body-font), "Libertinus Serif", "Latin Modern Roman", Charter, Georgia, serif;
+  font-size: 17px;
+  line-height: 1.55;
+  text-align: justify;
+  hyphens: auto;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  max-width: var(--content-width);
+  color: #1a1a1a;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-align: left;
+  line-height: 1.25;
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-weight: 300;
+  font-size: 2rem;
+  text-align: center;
+  margin-top: 0;
+}
+
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.15rem; }
+h4 { font-size: 1rem; }
+
+a { color: var(--link); }
+a:hover,
+a:focus-visible { text-decoration: underline; }
+
+code, pre {
+  font-family: var(--code-font), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+p code, li code, dd code, td code {
+  font-size: 0.9em;
+  background: #f3f3f3;
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+}
+
+pre {
+  background: #f7f7f7;
+  border: 1px solid #ececec;
+  border-radius: 4px;
+  padding: 0.75em 1em;
+  overflow-x: auto;
+  text-align: left;
+}
+
+pre code {
+  font-weight: 200;
+  font-size: 0.85em;
+  background: none;
+  padding: 0;
+}
+
+/* Inline dt/dd so the term and its definition share a line, matching the
+   PDF term-list rendering. The break between entries is on ::after of dd.
+   Typst sometimes wraps dd content in <p> when the body has paragraph-level
+   structure; flatten that single child so it doesn't force a line break. */
+dl { margin: 1em 0; }
+dl dt { display: inline; font-weight: bold; margin-right: 0.6em; }
+dl dd { display: inline; margin: 0; }
+dl dd > p:only-child { display: inline; margin: 0; }
+dl dd::after { content: ""; display: block; margin-bottom: 0.4em; }
+
+/* Aside: tangential, de-emphasized content. Mirrors the indent + muted
+   appearance of the `aside` function in PDF mode. Uses opacity (rather
+   than `color`) so the fade applies uniformly to text, links, and the
+   inline-SVG math glyphs (which carry their own hardcoded fill). This
+   also matches the PDF semantics, where `text(fill: muted)` is a 50%
+   blend toward the page background. */
+blockquote.aside {
+  margin: 0.6em 0;
+  padding-left: 2em;
+  border-left: none;
+  opacity: 0.707;
+  font-style: normal;
+}
+blockquote.aside > p:first-child { margin-top: 0; }
+blockquote.aside > p:last-child { margin-bottom: 0; }
+
+ul, ol { padding-left: 1.5em; }
+
+table {
+  border-collapse: collapse;
+  margin: 1em auto;
+  text-align: left;
+}
+
+th, td { padding: 0.3em 0.7em; }
+
+/* Table of contents — collapsible <details> in both layouts. On narrow
+   screens it sits inline at the top of the document. On wide screens it
+   pins to the left edge as a fixed sidebar, and the html element gains
+   left padding so body content shifts right when the TOC is expanded. */
+details.toc { text-align: left; hyphens: manual; }
+details.toc nav[role="doc-toc"] a { text-decoration: none; color: inherit; }
+details.toc nav[role="doc-toc"] a:hover,
+details.toc nav[role="doc-toc"] a:focus-visible {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+@media (min-width: 1200px) {
+  details.toc {
+    position: fixed;
+    inset: 0 auto 0 0;
+    overflow-y: auto;
+    padding: 1.5rem 1rem;
+    font-size: 0.85rem;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.2s;
+  }
+  details.toc:hover {
+    scrollbar-color: var(--rule) transparent;
+  }
+  details.toc::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+  }
+  details.toc::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  details.toc::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  details.toc:hover::-webkit-scrollbar-thumb {
+    background: var(--rule);
+  }
+  /* Expanded sidebar takes the full sidebar width with a divider; body
+     content shifts via padding on <html>. Collapsed, the sidebar shrinks
+     to its summary and content returns to a centered column. */
+  details.toc[open] {
+    width: var(--sidebar-width);
+    border-right: 1px solid var(--rule);
+  }
+  html:has(details.toc[open]) {
+    padding-left: calc(var(--sidebar-width) + var(--sidebar-gap));
+  }
+}
+
+/* Inline math SVG should sit on the text baseline.
+   Use :is() (not :where()) so the rule wins over default svg styling. */
+:is(p, li, dd, td, h1, h2, h3, h4, h5, h6) > svg {
+  vertical-align: middle;
+}

@@ -1,33 +1,13 @@
-#import "/style.typ": theme
-#show: theme
-
+#import "/style.typ": note, note-ref, theme
 #import "@preview/booktabs:0.0.4": *
+
+#set document(title: "ELEC0129")
+
+#show: theme
 #show: booktabs-default-table-style
 
-#set page(height: auto) // mimic page-less format
 
-#set math.mat(delim: "[")
-#set math.vec(delim: "[")
-
-#let note-counter = counter("notes")
-#let note-ref(label) = context {
-  link(label)[#super[#text(fill: rgb(255, 155, 200))[
-    #note-counter.at(label).first()
-  ]]]
-}
-#let note(label, body, number: false) = {
-  note-counter.step()
-  block([
-    #if number {
-      context note-counter.display()
-    }
-    #body
-    #label
-  ])
-}
-
-
-#title[notation hell :]
+#title()
 
 = Intro
 == Basic Notation

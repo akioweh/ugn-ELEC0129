@@ -1,0 +1,58 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: typst-community/setup-typst@v5
+      - run: typst compile main.typ main.pdf
+      - run: typst compile main.typ main.html --format html --features html
+      - run: |
+          # Typst's HTML backend doesn't emit <html lang>; inject it so
+          # browsers know what language to hyphenate.
+          sed -i 's|<html>|<html lang="en">|' main.html
+          mkdir -p _site
+          cp main.html _site/index.html
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TIMESTAMP_TAG=$(date +'%Y%m%d-%H%M%S')
+          TIMESTAMP_TITLE=$(date +'%Y-%m-%d %H:%M:%S')
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+
+          gh release create "build-$TIMESTAMP_TAG" main.pdf \
+            --title "$REPO_NAME - $TIMESTAMP_TITLE" \
+            --notes "Automated PDF build from $GITHUB_SHA" \
+            --target "$GITHUB_SHA" \
+            --latest
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
