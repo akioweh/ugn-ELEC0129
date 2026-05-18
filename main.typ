@@ -1,4 +1,4 @@
-#import "/style.typ": note, note-ref, theme
+#import "/style.typ": aside, note, note-ref, theme
 #import "@preview/booktabs:0.0.4": *
 
 #set document(title: "ELEC0129")
@@ -43,6 +43,8 @@ The same goes for other transforms, e.g., homogeneous transforms $T$.
 
 === Rotations
 
+Remember to use the right-hand corkscrew rule to figure which way is the positive angle.
+
 ==== Matrix Repr.
 
 The rotation of ${B}$ wrt. ${A}$ can be represented as a $3 times 3$ matrix:
@@ -55,36 +57,128 @@ $
 $
 where $hat(X), hat(Y), hat(Z)$ are the orthonormal basis vectors of a frame.
 
-Rotation about $x$-axis by $theta$:
-$mat(1, 0, 0; 0, cos(theta), -sin(theta); 0, sin(theta), cos(theta);)$.
+Rotations about a given axis by $theta$:
 
-Rotation about $y$-axis by $theta$:
-$mat(cos(theta), 0, sin(theta); 0, 1, 0; -sin(theta), 0, cos(theta);)$.
+$R_X = mat(1, 0, 0; 0, cos(theta), -sin(theta); 0, sin(theta), cos(theta);)$
 
-Rotation about $z$-axis by $theta$:
-$mat(cos(theta), -sin(theta), 0; sin(theta), cos(theta), 0; 0, 0, 1;)$.
+$R_Y = mat(cos(theta), 0, sin(theta); 0, 1, 0; -sin(theta), 0, cos(theta);)$
+
+$R_Z = mat(cos(theta), -sin(theta), 0; sin(theta), cos(theta), 0; 0, 0, 1;)$
 
 Rotation matrices are orthogonal: $attach(R, tl: B, bl: A) = attach(R, tl: A, bl: B)^(-1) = attach(R, tl: A, bl: B)^T$.
 
 ==== Roll-pitch-yaw Repr.
 
-Aka. XYZ-fixed-angle representation.
+Aka. fixed-angle representation.
 
-Remember to use the right-hand corkscrew rule to figure which way is the positive angle.
+#aside[
+  Three rotations about a fixed set of axes (e.g. the base frame's). \
+  Modern terminology calls this _extrinsic_ Euler angles.
+]
 
-*To finish watching Task 3.4.*
+For XYZ $->$ $alpha$ $beta$ $gamma$:
+
+$R = R_Z (alpha) R_Y (beta) R_X (gamma)$
+
+$
+  R = mat(
+    cos alpha cos beta, cos alpha sin beta sin gamma - sin alpha cos gamma, cos alpha sin beta cos gamma + sin alpha sin gamma;
+    sin alpha cos beta, sin alpha sin beta sin gamma + cos alpha cos gamma, sin alpha sin beta cos gamma - cos alpha sin gamma;
+    -sin beta, cos beta sin gamma, cos beta cos gamma;
+  )
+$
+
+Useful inverses:
+
+#let atan2 = math.op("atan2")
+$beta = atan2(-r_31, sqrt(r_11^2 + r_21^2)) \
+alpha = atan2(r_21 / (cos beta), r_11 / (cos beta)) \
+gamma = atan2(r_32 / (cos beta), r_33 / (cos beta))$
+
+Singularity when $cos beta = 0 <==> beta = (n + 1/2) pi$
 
 ==== Euler Angles Repr.
 
-*To watch, Task 3.5.*
+#aside[
+  Three rotations about a moving set of axes (that attach to the rotating object). \
+  Modern terminology calls this _intrinsic_ Euler angles.
+]
 
-==== Equivalent Angle-Axis Repro.
+Note that extrinsic and intrinsic Euler angles are equivalent via a reversal of axis order; \
+For ZYX $->$ $alpha$ $beta$ $gamma$:
 
-*To watch, Task 3.6.*
+$R = R_Z (alpha) R_Y (beta) R_X (gamma)$
+
+As this is identical to the roll-pitch-yaw representation, the same formula applies, but with the angles pertaining to different axes.
+
+==== Angle-Axis Repr.
+
+Aka. Axis-Angle representation.
+
+Rotation is described by a vector + a scalar: \
+an axis of rotation $k$ and an angle of rotation $theta$ about that axis.
+
+$k = vec(k_x, k_y, k_z)$
+
+Invariant: $norm(k) = 1$.
+
+Problems:
+- 0-vector is ambiguous: the axis becomes undefined.
+- 0-degree rotations are problematic: they result in a 0-vector.
+
+#let siv = math.op("siv")
+$
+  R = mat(
+    k_x^2 siv theta + cos theta, k_x k_y siv theta - k_z sin theta, k_x k_z siv theta + k_y sin theta;
+    k_y k_x siv theta + k_z sin theta, k_y^2 siv theta + cos theta, k_y k_z siv theta - k_x sin theta;
+    k_z k_x siv theta - k_y sin theta, k_z k_y siv theta + k_x sin theta, k_z^2 siv theta + cos theta;
+  )
+$
+
+where $siv(theta) = 1 - cos theta$.
+
+Useful inverses:
+
+$theta = arccos(1/2 (r_11 + r_22 + r_33 - 1)) \
+k = 1 / (2 sin theta) vec(r_32 - r_23, r_13 - r_31, r_21 - r_12)$
+
+Singularity when $sin theta = 0 <==> theta = n pi$.
 
 ==== Euler Parameters Repr.
 
-*To watch, Task 3.7.*
+We can avoid singularities of three-parameter representations by, well, using four parameters.
+
+For a rotation with axis represented by a unit vector $k$ and angle $theta$, its four Euler parameters are:
+
+$epsilon_1 = k_x sin theta/2$ \
+$epsilon_2 = k_y sin theta/2$ \
+$epsilon_3 = k_z sin theta/2$ \
+$epsilon_4 = cos theta/2$
+
+Invariant: $epsilon_1^2 + epsilon_2^2 + epsilon_3^2 + epsilon_4^2 = 1$.
+
+$
+  R = mat(
+    1 - 2 (epsilon_2^2 + epsilon_3^2), 2 (epsilon_1 epsilon_2 - epsilon_3 epsilon_4), 2 (epsilon_1 epsilon_3 + epsilon_2 epsilon_4);
+    2 (epsilon_1 epsilon_2 + epsilon_3 epsilon_4), 1 - 2 (epsilon_1^2 + epsilon_3^2), 2 (epsilon_2 epsilon_3 - epsilon_1 epsilon_4);
+    2 (epsilon_1 epsilon_3 - epsilon_2 epsilon_4), 2 (epsilon_2 epsilon_3 + epsilon_1 epsilon_4), 1 - 2 (epsilon_1^2 + epsilon_2^2);
+  )
+$
+
+Useful inverses:
+
+$epsilon_4 = 1/2 sqrt(1 + r_11 + r_22 + r_33) \
+epsilon_1 = 1/2 sqrt(1 + r_11 - r_22 - r_33) \
+epsilon_2 = 1/2 sqrt(1 - r_11 + r_22 - r_33) \
+epsilon_3 = 1/2 sqrt(1 - r_11 - r_22 + r_33)$
+
+... shortcut if $epsilon_4 != 0$:
+
+$epsilon_1 = (r_32 - r_23) / (4 epsilon_4) \
+epsilon_2 = (r_13 - r_31) / (4 epsilon_4) \
+epsilon_3 = (r_21 - r_12) / (4 epsilon_4)$
+
+No singularities by construction.
 
 === Translations
 
