@@ -364,4 +364,84 @@ $
 
 == Inverse Kinematics
 
+=== Algebraic Solution to Planar RRR
+
+For a planar RRR robot, we have
+
+$
+  attach(T, tl: 0, bl: 3) = mat(
+    cos(theta_1 + theta_2 + theta_3), -sin(theta_1 + theta_2 + theta_3), 0, L_2 cos (theta_1 + theta_2) + L_1 cos theta_1;
+    sin(theta_1 + theta_2 + theta_3), cos(theta_1 + theta_2 + theta_3), 0, L_2 sin (theta_1 + theta_2) + L_1 sin theta_1;
+    0, 0, 1, 0;
+    0, 0, 0, 1;
+  ) = mat(
+    cos phi, -sin phi, 0, x;
+    sin phi, cos phi, 0, y;
+    0, 0, 1, 0;
+    0, 0, 0, 1;
+  )
+$
+
+For a target ${3}$ pose of $(x, y, phi)$, we want to solve for the joint angles $theta_1$, $theta_2$, and $theta_3$.
+
+Clearly, we have
+
+$cos phi = cos(theta_1 + theta_2 + theta_3) \
+sin phi = sin(theta_1 + theta_2 + theta_3) \
+x = L_2 cos(theta_1 + theta_2) + L_1 cos theta_1 \
+y = L_2 sin(theta_1 + theta_2) + L_1 sin theta_1$
+
+*Firstly, $theta_2$*
+
+#underline[_Square and sum_] the equations for $x$ and $y$
+
+$x^2 + y^2 &= L_1^2 + 2 L_1 L_2 (cos theta_1 cos(theta_1 + theta_2) + sin theta_1 sin(theta_1 + theta_2)) &+ L_2^2 \
+&= L_1^2 + 2 L_1 L_2 cos theta_2 &+ L_2^2$
+
+$cos theta_2 = (x^2 + y^2 - L_1^2 - L_2^2) / (2 L_1 L_2)$
+
+A clean way to obtain both solutions is to use $atan2$:
+
+$theta_2 = atan2(plus.minus sqrt(1 - cos^2 theta_2), cos theta_2)$
+
+*Secondly, $theta_1$*
+
+With knowledge of $cos theta_2$ and $sin theta_2$, we can trig identity our way into reduced equations for $x$ and $y$:
+
+$x &= L_2 cos(theta_1 + theta_2) + L_1 cos theta_1 quad = L_2 (cos theta_1 cos theta_2 - sin theta_1 sin theta_2) + L_1 cos theta_1 \
+&= (L_2 cos theta_2 + L_1) cos theta_1 - (L_2 sin theta_2) sin theta_1$
+
+$y &= L_2 sin(theta_1 + theta_2) + L_1 sin theta_1 quad = L_2 (sin theta_1 cos theta_2 + cos theta_1 sin theta_2) + L_1 sin theta_1 \
+&= (L_1 + L_2 cos theta_2) sin theta_1 + (L_2 sin theta_2) cos theta_1$
+
+Extract the common, now-known coefficients:
+
+$K_1 &= L_2 cos theta_2 + L_1 \
+K_2 &= L_2 sin theta_2$
+
+Now, once we have
+
+$x = K_1 cos theta_1 - K_2 sin theta_1 \
+y = K_1 sin theta_1 + K_2 cos theta_1$
+
+we perform #underline[_trigonometric substitution_]: define $gamma$ and $r$ as the angle (opposite $K_2$) and the hypotenuse of the right triangle with legs $K_1$ and $K_2$
+
+$r = sqrt(K_1^2 + K_2^2) \
+gamma = atan2(K_2, K_1)$
+
+and so
+
+$x / r = cos gamma cos theta_1 - sin gamma sin theta_1 = cos (gamma + theta_1) \
+y / r = cos gamma sin theta_1 + sin gamma cos theta_1 = sin (gamma + theta_1)$
+
+finally
+
+$theta_1 = atan2(y / r, x / r) - gamma$
+
+*Lastly, $theta_3$*
+
+Observe that $theta_1 + theta_2 + theta_3 = atan2(sin phi, cos phi)$, so
+
+$theta_3 = atan2(sin phi, cos phi) - theta_1 - theta_2$
+
 
