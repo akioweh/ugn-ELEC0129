@@ -444,4 +444,120 @@ Observe that $theta_1 + theta_2 + theta_3 = atan2(sin phi, cos phi)$, so
 
 $theta_3 = atan2(sin phi, cos phi) - theta_1 - theta_2$
 
+== Jacobians
+
+Forward kinematics are functions of "joint angles" $mapsto$ "end-effector pose". \
+Jacobians are the derivatives of these functions wrt. time; Jacobians map joint velocities to cartesian velocity (of end-effector).
+
+It is the "full" derivative of a vector-valued multivariate function, represented as a matrix of partial derivatives.
+
+A function $f: RR^n -> RR^m$ has a Jacobian $J$ of size $m times n$. \
+In robotics, our FK functions have output dimension $m = 6$ (3 for position + 3 for orientation), and input dimension $n$ is the number of joints.
+
+Sometimes $m = 3$ when only dealing with position (or orientation)... or even $m = 2$ for planar robots.
+
+We have two main methods to compute the Jacobian of a FK function: velocity propagation and direct differentiation.
+
+
+==== Notation
+
+_Absolute_ angular velocity of ${i}$ (wrt. ${0}$): $omega_i$.
+
+_Relative_ angular velocity of ${i}$ (wrt. ${i-1}$; i.e., angular velocity of joint $i$): $Omega_i$.
+
+_Absolute_ linear velocity of ${i}$ (wrt. ${0}$): $v_i$.
+
+Note that $Omega$ always denotes a velocity relative to the directly preceding frame.
+
+All of these measures, as usual, can be expressed in any frame, e.g. $attach(omega, tl: A, br: i)$. \
+Without a TL-script, absolute velocities are implicitly expressed in the base frame ${0}$.
+
+Angular velocity is represented as a vector; direction is axis and magnitude is speed.
+
+Note that the cross-product $omega times P$ gives the tangential linear velocity at $P$ due to $w$.
+
+// $omega_i eq.delta attach(Omega, tl: 0, br: i) = attach(R, tl: 0, bl: i-1) thick attach(Omega, tl: i-1, br: i)$
+
+$attach(v, tl: i, br: i+1) eq.def dif/(dif t) (attach(P, tl: i, br: i+1))$
+
+Generalized joint parameter (represents either $theta$ or $d$): $q_i$
+
+$bold(q) = vec(q_1, ..., q_n)$
+
+Jacobian (linear + angular): $bold(J)$ \
+Liner-velocity Jacobian: $bold(J)_v$ \
+Angular-velocity Jacobian: $bold(J)_omega$
+
+=== Velocity Propagation
+
+Quite intuitive; roughly,
++ describe each link's "own" (relative to its own frame) velocity as a function of its joint velocity
++ start from base and "propagate" the velocities down the chain using the transformations between frames
++ express the end-effector velocity in the base frame
++ extract the Jacobian by matching coefficients of $dot(q)_i$
+
+This works for both linear and angular velocities.
+
+=== Direct Differentiation
+
+This method, unlike velocity propagation, does not work well for angular velocities... due to math reasons.
+(How do you differentiate a rotation matrix?)
+
++ obtain the FK function $[x, y, z] = f(q_1, ..., q_n)$
++ differentiate $f$ wrt. $t$; compute all its partial derivatives $(partial f) / (partial q_i)$
++ arrange partials in a matrix to obtain (linear-velocity-only) Jacobian $bold(J)_v$
+
+
+$dot(x) = (partial f_x) / (partial q_1) dot(q)_1 + ... + (partial f_x) / (partial q_n) dot(q)_n \
+dot(y) = (partial f_y) / (partial q_1) dot(q)_1 + ... + (partial f_y) / (partial q_n) dot(q)_n \
+dot(z) = (partial f_z) / (partial q_1) dot(q)_1 + ... + (partial f_z) / (partial q_n) dot(q)_n$
+
+
+$
+  bold(J)_v = mat((partial f) / (partial q_1), (partial f) / (partial q_2), ..., (partial f) / (partial q_n);) = mat(
+    gradient^top f_x;
+    gradient^top f_y;
+    gradient^top f_z;
+  ) =
+  mat(
+    (partial f_x) / (partial q_1), (partial f_x) / (partial q_2), ..., (partial f_x) / (partial q_n);
+    (partial f_y) / (partial q_1), (partial f_y) / (partial q_2), ..., (partial f_y) / (partial q_n);
+    (partial f_z) / (partial q_1), (partial f_z) / (partial q_2), ..., (partial f_z) / (partial q_n);
+  )
+$
+
+
+$
+  dot(bold(x)) = bold(J) dot(bold(q))
+$
+
+== other stuff
+
+/ Singularities: values of $bold(q)$ that result in $det(bold(J)) = 0$
+
+*Statics*
+
+The Jacobian also maps end-effector forces to joint torques:
+
+$
+  bold(tau) = bold(J)^top bold(F)
+$
+
+Derivation: \
+consider mechanical power in both joint space and cartesian space:
+
+$
+  "Power" & = bold(F) dot dot(bold(x))   && = bold(F)^top dot(bold(x)) \
+  "Power" & = bold(tau) dot dot(bold(q)) && = bold(tau)^top dot(bold(q)) \
+$
+
+then, by the conservation of energy,
+
+$
+  bold(tau)^top dot(bold(q)) & = bold(F)^top dot(bold(x)) \
+  bold(tau)^top dot(bold(q)) & = bold(F)^top (bold(J) dot(bold(q))) \
+               bold(tau)^top & = bold(F)^top bold(J) \
+                   bold(tau) & = bold(J)^top bold(F)
+$
+
 
