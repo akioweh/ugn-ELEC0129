@@ -882,7 +882,12 @@ $attach(bold(J)_v, tl: e) = attach(R, tl: e, bl: 0) thin attach(bold(J)_v, tl: 0
 $
   M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + G(bold(q)) = bold(tau) - bold(tau)_f
 $
-where $bold(tau)_f$ is the friction forces, which can be modeled as a function of $bold(q)$ and $dot(bold(q))$.
+where $bold(tau)_f$ is the friction forces.
+
+Common models:
+- _Viscous_: $bold(tau)_f = k dot(bold(q))$.
+- _Coulomb_: $bold(tau)_f = c "sgn"(dot(bold(q)))$ (constant magnitude, sign of velocity).
+- _Combined_: $bold(tau)_f = c "sgn"(dot(bold(q))) + k dot(bold(q))$.
 
 == Manipulator Control
 
