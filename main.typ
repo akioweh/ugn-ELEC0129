@@ -65,7 +65,7 @@ $R_Y = mat(cos(theta), 0, sin(theta); 0, 1, 0; -sin(theta), 0, cos(theta);)$
 
 $R_Z = mat(cos(theta), -sin(theta), 0; sin(theta), cos(theta), 0; 0, 0, 1;)$
 
-Rotation matrices are orthogonal: $attach(R, tl: B, bl: A) = attach(R, tl: A, bl: B)^(-1) = attach(R, tl: A, bl: B)^T$.
+Rotation matrices are orthogonal: $attach(R, tl: B, bl: A) = attach(R, tl: A, bl: B)^(-1) = attach(R, tl: A, bl: B)^top$.
 
 ==== Roll-pitch-yaw Repr.
 
@@ -241,7 +241,7 @@ $
   mat(
     augment: #(hline: 3, vline: 3),
     , , , ;
-    , #box(height: 0em, baseline: -0.7em, $attach(R, tl: A, bl: B)^T$), , #box(height: 0em, baseline: -0.7em, $attach(R, tl: A, bl: B)^T attach(P, tl: A, br: B_"org")$)
+    , #box(height: 0em, baseline: -0.7em, $attach(R, tl: A, bl: B)^top$), , #box(height: 0em, baseline: -0.7em, $-attach(R, tl: A, bl: B)^top attach(P, tl: A, br: B_"org")$)
     ;
     , , , ;
     0, 0, 0, 1;
