@@ -860,13 +860,41 @@ E.g. *rectangular block* ($l times w times h$), frame at the centre, axes aligne
 
 $I_(x x) = m/12 (l^2 + h^2), quad I_(y y) = m/12 (w^2 + h^2), quad I_(z z) = m/12 (w^2 + l^2)$
 
+=== Cartesian-Space Dynamics
+
+Premultiply joint-space dynamics by $bold(J)^(-top)$ and use $bold(tau) = bold(J)^top bold(F)$, $dot.double(bold(x)) = bold(J) dot.double(bold(q)) + dot(bold(J)) dot(bold(q))$:
+
+$ M_x dot.double(bold(x)) + V_x + G_x = bold(F) $
+
+where
+
+$M_x = bold(J)^(-top) M bold(J)^(-1) \
+V_x = bold(J)^(-top) (V - M bold(J)^(-1) dot(bold(J)) dot(bold(q))) \
+G_x = bold(J)^(-top) G$
+
+Useful when forces are naturally expressed in task space (e.g. polishing). \
+One may also use the Jacobian expressed in ${e}$  so the force aligns with tool axes regardless of pose: \
+$attach(bold(J)_v, tl: e) = attach(R, tl: e, bl: 0) thin attach(bold(J)_v, tl: 0)$
+
 === Friction
 
 
 $
   M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + G(bold(q)) = bold(tau) - bold(tau)_f
 $
-where $bold(tau)_f$ is the friction forces, which can be modeled as a function of $bold(q)$ and $dot(bold(q))$.
+where $bold(tau)_f$ is the friction torques. Common models:
+- _Viscous_: $bold(tau)_f = k dot(bold(q))$ (linear in speed).
+- _Coulomb_: $bold(tau)_f = c "sgn"(dot(bold(q)))$ (constant magnitude, sign of velocity).
+- _Combined_: $bold(tau)_f = c "sgn"(dot(bold(q))) + k dot(bold(q))$.
+
+=== Simulation
+
+Solve for the highest derivative:
+$dot.double(bold(q)) = M^(-1) (bold(tau) - V - G)$
+
+Euler-integrate with constant-acceleration assumption over step $T$:
+$dot(bold(q))_(k+1) = dot(bold(q))_k + dot.double(bold(q))_k T \
+bold(q)_(k+1) = bold(q)_k + dot(bold(q))_k T + 1/2 dot.double(bold(q))_k T^2$
 
 == Manipulator Control
 
@@ -922,6 +950,8 @@ One can partition the controller into two parts, a model-based compensator and a
 I.e., \
 $m dot.double(x) + b dot(x) + k x = F = m(-k_v dot(x) - k_p x) + b dot(x) + k x \
 dot.double(x) + k_v dot(x) + k_p x = 0$
+
+Critical damping is then $k_v = 2 sqrt(k_p)$ -- _no $m$_, since the inner plant is unit mass. (Contrast with PD on a natural MSD: $k_v = 2 sqrt(m k_p)$.)
 
 === Nonzero Setpoint
 
