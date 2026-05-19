@@ -749,12 +749,12 @@ $
   M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + G(bold(q)) = bold(tau)
 $
 
-$M(bold(q))$ is an $n times n$ _mass matrix_; \
-$V(bold(q), dot(bold(q)))$ is an $n$-dim vector representing the Coriolis and centrifugal forces; \
-$G(bold(q))$ is an $n$-dim vector representing gravitational forces.
+$M(bold(q))$ is the $n times n$ _mass matrix_; \
+$V(bold(q), dot(bold(q)))$ is an $n$-dim vector of _centrifugal_ ($prop dot(q)_i^2$) and _Coriolis_ ($prop dot(q)_i dot(q)_j$, $i != j$) terms; \
+$G(bold(q))$ is an $n$-dim vector of gravitational forces.
 
-$M$ is positive-definite and symmetric, and thus invertible. \
-$V$ can be derived from $M$ (but it is complicated and out-of-scope).
+$M$ is positive-definite and symmetric, hence invertible. \
+$V$ can be derived from $M$ (out-of-scope) and vanishes if $M$ is constant.
 
 *Newton Euler Formula*
 
