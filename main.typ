@@ -95,7 +95,9 @@ $beta = atan2(-r_31, sqrt(r_11^2 + r_21^2)) \
 alpha = atan2(r_21 / (cos beta), r_11 / (cos beta)) \
 gamma = atan2(r_32 / (cos beta), r_33 / (cos beta))$
 
-Singularity when $cos beta = 0 <==> beta = (n + 1/2) pi$
+A second solution exists from the $-sqrt$ branch ($beta' = pi - beta$, with corresponding $alpha', gamma'$).
+
+Singularity when $cos beta = 0 <==> beta = (n + 1/2) pi$; only $alpha plus.minus gamma$ is recoverable.
 
 ==== Euler Angles Repr.
 
@@ -143,6 +145,8 @@ $theta = arccos(1/2 (r_11 + r_22 + r_33 - 1)) \
 k = 1 / (2 sin theta) vec(r_32 - r_23, r_13 - r_31, r_21 - r_12)$
 
 Singularity when $sin theta = 0 <==> theta = n pi$.
+
+Fallback for $theta = pi$: read $k_i^2 = (r_(i i) + 1)/2$ from the diagonal; signs fixed by off-diagonals $r_(i j) = 2 k_i k_j$ ($i != j$).
 
 ==== Euler Parameters Repr.
 
