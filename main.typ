@@ -600,3 +600,37 @@ where $bold(tau)_f$ is the friction torque, which can be modeled as a function o
 
 == Manipulator Control
 
+=== Second Order Linear Systems
+
+E.g., *Mass-Spring System*
+
+Frictionless:
+
+$
+  m dot.double(x) + k x = 0 \
+  x = R cos(sqrt(k / m) t - phi)
+$
+
+With viscous friction $b$:
+
+$
+  m dot.double(x) + b dot(x) + k x = 0 \
+$
+
+Characteristic equation:
+
+$
+  m lambda^2 + b lambda + k = 0 \
+  lambda_1, lambda_2 = (-b plus.minus sqrt(b^2 - 4 m k)) / (2 m)
+$
+
+- Underdamped: complex conjugate roots \
+  $x = e^(p t) (c_1 cos(q t) + c_2 sin(q t))$ \
+  where $lambda_(1,2) = p plus.minus q i$
+- Critically damped: repeated real root \
+  $x = (c_1 + c_2 t) e^(lambda t)$
+- Overdamped: two real roots \
+  $x = c_1 e^(lambda_1 t) + c_2 e^(lambda_2 t)$
+
+
+
