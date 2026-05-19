@@ -762,14 +762,71 @@ $G(bold(q))$ is an $n$-dim vector of gravitational forces.
 $M$ is positive-definite and symmetric, hence invertible. \
 $V$ can be derived from $M$ (out-of-scope) and vanishes if $M$ is constant.
 
-*Newton Euler Formula*
+=== Newton-Euler Formulation
 
 $
   bold(F) & = m dot(bold(v)) \
         N & = attach(I, tl: c) dot(omega) + omega times attach(I, tl: c) omega \
 $
 
-$attach(I, tl: c)$ is the _inertia tensor_ of the body expressed in the body's center of mass frame ${c}$.
+$attach(I, tl: c)$ is the _inertia tensor_ at the body's center-of-mass frame ${c}$.
+
+Two passes:
++ _Outward iteration_ (${0} arrow {e}$): propagate velocities and accelerations, then compute each link's net force/moment at its CoM.
++ _Inward iteration_ (${e} -> {0}$): solve for the inter-link wrench transmitted across each joint; extract joint torque/force by projection onto the joint axis.
+
+==== Outward Iteration
+
+Initial conditions: $attach(omega, tl: 0, br: 0) = 0$, $attach(dot(omega), tl: 0, br: 0) = 0$, $attach(dot(v), tl: 0, br: 0) = -g$.
+
+#aside[
+  Gravity trick: setting $attach(dot(v), tl: 0, br: 0)$ to the opposite of the gravity vector is a clean substitution for the $G$ component of the dynamics equation.
+]
+
+For each link $i = 0, ..., n-1$:
+
+$
+  attach(omega, tl: i+1, br: i+1) &= attach(R, tl: i+1, bl: i) thin attach(omega, tl: i, br: i) + dot(theta)_(i+1) hat(Z) \
+  attach(dot(omega), tl: i+1, br: i+1) &= attach(R, tl: i+1, bl: i) thin attach(dot(omega), tl: i, br: i) + (attach(R, tl: i+1, bl: i) thin attach(omega, tl: i, br: i) times dot(theta)_(i+1) hat(Z)) + dot.double(theta)_(i+1) hat(Z) \
+  attach(dot(v), tl: i+1, br: i+1) &= attach(R, tl: i+1, bl: i) thin (attach(dot(v), tl: i, br: i) + attach(dot(omega), tl: i, br: i) times attach(P, tl: i, br: i+1) + attach(omega, tl: i, br: i) times (attach(omega, tl: i, br: i) times attach(P, tl: i, br: i+1))) \
+  &quad quad ""+ 2 thin attach(omega, tl: i+1, br: i+1) times (dot(d)_(i+1) hat(Z)) + dot.double(d)_(i+1) hat(Z)
+$
+
+Prismatic terms ($dot(d), dot.double(d)$) drop for revolute joints; rotational $dot(theta), dot.double(theta)$ terms drop for prismatic.
+
+Propagate the linear acceleration to the CoM:
+
+$
+  attach(dot(v), tl: i+1, br: c_(i+1)) = attach(dot(v), tl: i+1, br: i+1) + attach(dot(omega), tl: i+1, br: i+1) times attach(P, tl: i+1, br: c_(i+1)) + attach(omega, tl: i+1, br: i+1) times (attach(omega, tl: i+1, br: i+1) times attach(P, tl: i+1, br: c_(i+1)))
+$
+
+Net wrench at the CoM:
+
+$
+  attach(F, tl: i+1, br: i+1) &= m_(i+1) attach(dot(v), tl: i+1, br: c_(i+1)) \
+  attach(N, tl: i+1, br: i+1) &= attach(I, tl: c_(i+1), br: i+1) attach(dot(omega), tl: i+1, br: i+1) + attach(omega, tl: i+1, br: i+1) times (attach(I, tl: c_(i+1), br: i+1) attach(omega, tl: i+1, br: i+1))
+$
+
+==== Inward Iteration
+
+Initial: $attach(f, tl: n+1, br: n+1)$ and $attach(n, tl: n+1, br: n+1)$ set to the external forces.
+
+For $i = n, ..., 1$:
+
+$
+  attach(f, tl: i, br: i) &= attach(R, tl: i, bl: i+1) thin attach(f, tl: i+1, br: i+1) + attach(F, tl: i, br: i) \
+  attach(n, tl: i, br: i) &= attach(R, tl: i, bl: i+1) thin attach(n, tl: i+1, br: i+1) + attach(P, tl: i, br: c_i) times attach(F, tl: i, br: i) + attach(P, tl: i, br: i+1) times (attach(R, tl: i, bl: i+1) thin attach(f, tl: i+1, br: i+1)) + attach(N, tl: i, br: i)
+$
+
+Extract the joint torque/force by projection onto the joint axis:
+
+$
+  tau_i = cases(
+    attach(n, tl: i, br: i) dot hat(Z) quad & "if revolute",
+    attach(f, tl: i, br: i) dot hat(Z) & "if prismatic"
+  )
+$
+
 
 === Friction
 
