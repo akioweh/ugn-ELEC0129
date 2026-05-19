@@ -668,3 +668,52 @@ where $x_d$, $dot(x)_d$, and $dot.double(x)_d$ are the desired position, velocit
 Note that if we define the _tracking error_ as $e = x - x_d$, then the closed-loop dynamics of the error is \
 $dot.double(e) + k_v dot(e) + k_p e = 0$ \
 which is a mass-spring-damper system in of itself!
+
+=== Motor Physics
+
+For a permanent magnet DC motor:
+- $tau_m = k_m i_a$
+- $V_"emf" = k_e dot(theta)_m$
+
+where $k_m$ is the motor's torque constant; $k_e$ is its electrical constant
+
+A simple circuit model of one motor is
+$
+  L_a (dif i_a) / (dif t) + R_a i_a & = V_a - V_"emf" \
+                                    & = V_a - k_e dot(theta)_m
+$
+
+...but let's assume the inductance $L_a$ is negligible:
+$ R_a i_a = V_a - k_e dot(theta)_m $
+
+For a rotary shaft (+ gear) we have its moment of inertia $I$ and viscous friction $b$. \
+Consider a motor-load gear-gear system...
+
+Motor-side dynamics:
+$
+  I_m dot.double(theta)_m = tau_m - b_m dot(theta)_m - F r_m
+$
+
+Load-side dynamics (no additional $tau$ as it is not motorized):
+$
+  I dot.double(theta) = F r - b dot(theta)
+$
+
+With $eta = r / r_m$, the combined dynamics can be expressed in load-side terms as
+
+$
+  (I + I_m eta^2) dot.double(theta) + (b + b_m eta^2) dot(theta) = tau
+$
+which once again is a mass-spring-damper system (driven by $tau$, with zero proportional component).
+
+A partitioned control system:
+- $tau = (I + I_m eta^2) f + (b + b_m eta^2) dot(theta)$
+- $f = dot.double(theta)_d - k_v (dot(theta) - dot(theta)_d) - k_p (theta - theta_d)$
+- set desired stiffness $k_p$, then $k_v = 2 sqrt(k_p)$
+
+Finally, $tau_m = 1/eta tau$ and $tau_m = k_m i_a$ so
+$
+  V_a & = R_a i_a + k_e dot(theta)_m \
+      & = R_a (tau / (k_m eta)) + k_e eta dot(theta)
+$
+A function of voltage in terms of velocity and desired torque.
