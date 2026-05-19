@@ -269,7 +269,8 @@ The choice of orientation is arbitrary, and usually are done to make the angle/t
 A _frame_ is a local coordinate system that rigidly attaches to some object, usually a link or part of a robot.
 
 Conventionally, frame 0, notated ${0}$, is the _base_ frame of a robot, used to describe the robot's position and orientation in the world.
-Then, for a robot with $n$ joints, we have frames ${1}$ to ${n}$ rigidly attached to each link, and frame ${n}$, the _end effector_ frame, rigidly attaches to ${n-1}$ but represents the _tool center point_.
+Then, for a robot with $n$ joints, we have frames ${1}$ to ${n}$ rigidly attached to each link (frame ${i}$ on link $L_i$).
+The end-effector gets a special additional frame, the _tool center point_ (TCP).
 
 
 #pagebreak()
@@ -319,13 +320,13 @@ Also, $z_i$ is collinear to the common normal between $x_(i-1)$ and $x_i$, just 
   Another is to align $z_0$ with $z_1$ and place $x_0$ to 1. align with $x_1$ while $J_1$ is in its "home" state and 2. so ${0}_"org"$ is on the base/mount surface.
 ]
 
-Reset all prismatic joints to their zero position before placing frames.
-This helps create more intuitive $d$ parameters below.
+Frame ${n}$ placement:
+- orient $x_n$ to align with $x_(n-1)$ when joint $n$ is at its zero position
+- $a_(n-1)$ and $alpha_(n-1)$ are then determined as usual from axes $n-1$ and $n$.
 
-End-effector frame ${n}$ placement:
-- this will often violate the D-H constraints, so one might need a generic 6-DOF transform for ${n}$
-- align $z_n$ with the end-effector's _approach_ direction (e.g. the shaft of a drill)
-- align $x_n$ with the end-effector's _lateral_ direction, if it has one (e.g. the gripping direction of a gripper)
+TCP frame: typically a generic 6-DOF transform from ${n}$ (tool geometry rarely fits D-H constraints).
+- align $z$ with the end-effector's _approach_ direction (e.g. the shaft of a drill)
+- align $x$ with the end-effector's _lateral_ direction, if it has one (e.g. the gripping direction of a gripper)
 
 === Transformations
 
