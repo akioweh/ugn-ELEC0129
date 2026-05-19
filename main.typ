@@ -827,6 +827,38 @@ $
   )
 $
 
+=== Inertia Tensor
+
+For a body with a frame ${A}$ at a chosen reference point:
+$
+  attach(I, tl: A) = mat(
+    I_(x x), -I_(x y), -I_(x z);
+    -I_(x y), I_(y y), -I_(y z);
+    -I_(x z), -I_(y z), I_(z z);
+  )
+$
+
+_Mass moments of inertia_ (diagonal):
+
+$
+  I_(x x) & = integral.triple_V (y^2 + z^2) rho dif V \
+  I_(y y) & = integral.triple_V (x^2 + z^2) rho dif V \
+  I_(z z) & = integral.triple_V (x^2 + y^2) rho dif V
+$
+
+_Mass products of inertia_ (off-diagonal):
+
+$
+  I_(x y) & = integral.triple_V x y rho dif V \
+  I_(x z) & = integral.triple_V x z rho dif V \
+  I_(y z) & = integral.triple_V y z rho dif V
+$
+
+_Principal axes_: a frame orientation for which all products of inertia vanish; diagonal entries are then the _principal moments_. For dynamics, place the frame at each link's COM, giving $attach(I, tl: c_i, br: i)$.
+
+E.g. *rectangular block* ($l times w times h$), frame at the centre, axes aligned with edges (all products vanish by symmetry):
+
+$I_(x x) = m/12 (l^2 + h^2), quad I_(y y) = m/12 (w^2 + h^2), quad I_(z z) = m/12 (w^2 + l^2)$
 
 === Friction
 
