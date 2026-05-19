@@ -246,6 +246,7 @@ $
 $
 
 
+#pagebreak()
 = Terminology and Concepts
 
 == Joints
@@ -266,6 +267,8 @@ A _frame_ is a local coordinate system that rigidly attaches to some object, usu
 Conventionally, frame 0, notated ${0}$, is the _base_ frame of a robot, used to describe the robot's position and orientation in the world.
 Then, for a robot with $n$ joints, we have frames ${1}$ to ${n}$ rigidly attached to each link, and frame ${n}$, the _end effector_ frame, rigidly attaches to ${n-1}$ but represents the _tool center point_.
 
+
+#pagebreak()
 = Kinematics
 == Denavit-Hartenberg Parameters (modified)
 
@@ -560,4 +563,5 @@ $
                    bold(tau) & = bold(J)^top bold(F)
 $
 
+#pagebreak()
 
