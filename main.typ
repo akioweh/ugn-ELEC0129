@@ -391,6 +391,37 @@ Multiple solutions are useful for collision avoidance; the controller must still
 
 Solution methods: _closed-form_ (algebraic or geometric) and _numerical_.
 Only closed-form is in scope.
+
+=== Geometric Solution to Planar RRR
+
+For a 3-link planar manipulator (link lengths $L_1, L_2, L_3$) reaching ${3}$-frame pose $(x, y, phi)$, solve via the base–elbow–wrist triangle.
+
+*1. $theta_2$*
+
+#underline[_law of cosines_] on the $L_1$-$L_2$ triangle
+($cos$ term sign flip as the interior elbow angle is $pi - theta_2$):
+
+$
+  x^2 + y^2 & = L_1^2 + L_2^2 + 2 L_1 L_2 cos theta_2 \
+    theta_2 & = arccos((x^2 + y^2 - L_1^2 - L_2^2) / (2 L_1 L_2))
+$
+
+Elbow-up: $theta_2 ' = -theta_2$.
+
+*2. $theta_1$*
+
+Let $beta = atan2(y, x)$ (angle from base to wrist) and $psi$ be the interior angle at the base of the same triangle:
+
+$ L_2^2 = x^2 + y^2 + L_1^2 - 2 L_1 sqrt(x^2 + y^2) cos psi $
+
+then $theta_1 = beta plus.minus psi$ (elbow-up / elbow-down).
+
+*3. $theta_3$*
+
+Trivially, orientation closes out: $theta_3 = phi - theta_1 - theta_2$.
+
+This trick is planar-specific; non-planar arms require their own derivation.
+
 === Algebraic Solution to Planar RRR
 
 For a planar RRR robot, we have
