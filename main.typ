@@ -663,6 +663,86 @@ E.g. fully extended arm supporting a vertical load.
 
 == Trajectory Planning
 
+Design a _time profile_ $u = f(t)$ for the robot to follow between waypoints; $dot(u)$ and $dot.double(u)$ then follow by differentiation. Not concerned with the geometric path / route -- only the temporal evolution.
+
+Given $u_0$, $u_f$, $t_f$, design $u(t)$. $u$ can be either Cartesian or joint-space.
+
+Joint space: design $f_(theta_i)(t)$ for each joint independently.
+- Pro: cheap (no IK at runtime); free of singularity / workspace issues.
+- Con: Cartesian path is non-linear, may collide.
+
+Cartesian space: design $f_x (t), f_y (t), ...$ directly.
+- Pro: enforces geometric path shape and end-effector orientation.
+- Con: must solve IK at every time step; intermediate points may leave workspace, switch IK branches, or pass near singularities.
+
+=== Straight Line
+
+$u(t) = (u_f - u_0)/t_f t + u_0$ for $t < t_f$, else $u_f$.
+
+Velocity discontinuous at endpoints $arrow$ jerky motion, vibrations, wear. Rarely usable directly.
+
+=== Cubic Polynomial
+
+$u(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3$
+
+4 conditions: $u(0) = u_0$, $u(t_f) = u_f$, $dot(u)(0) = 0$, $dot(u)(t_f) = 0$.
+
+$a_0 = u_0, quad a_1 = 0, quad a_2 = 3/t_f^2 (u_f - u_0), quad a_3 = -2/t_f^3 (u_f - u_0)$
+
+Boundary accelerations are nonzero ($dot.double(u)(0) = 2 a_2$); acceleration is discontinuous at $t = 0, t_f$.
+
+=== Quintic Polynomial
+
+Adds $dot.double(u)(0) = 0$ and $dot.double(u)(t_f) = 0$ for 6 total conditions.
+
+$u(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3 + a_4 t^4 + a_5 t^5$
+
+$a_0 = u_0, quad a_1 = 0, quad a_2 = 0 \
+a_3 = 10/t_f^3 Delta, quad a_4 = -15/t_f^4 Delta, quad a_5 = 6/t_f^5 Delta$
+
+where $Delta = u_f - u_0$.
+Smooth acceleration throughout.
+
+=== Linear with Parabolic Blends (LSPB)
+
+Three segments:
++ parabolic blend $[0, t_b]$ at constant acceleration $dot.double(u)$
++ linear (constant-velocity) middle $[t_b, t_f - t_b]$
++ parabolic deceleration $[t_f - t_b, t_f]$ at $-dot.double(u)$
+
+Assumptions:
+- equal blend durations $t_b$ (symmetric)
+- symmetric about midpoint: $(t_h, u_h) = (t_f / 2, (u_0 + u_f) / 2)$
+- velocity continuous at end of first blend: $dot.double(u) t_b = (u_h - u_b) / (t_h - t_b)$
+
+In the first blend, $dot(u) = dot.double(u) t$ and $u = u_0 + 1/2 dot.double(u) t^2$.
+
+Substituting symmetry into the velocity-matching condition yields the quadratic
+$dot.double(u) t_b^2 - dot.double(u) t_f t_b + (u_f - u_0) = 0$
+
+Taking the minus branch ($t_b <= t_f / 2$):
+
+$t_b = t_f / 2 - sqrt(dot.double(u)^2 t_f^2 - 4 dot.double(u) (u_f - u_0)) / (2 dot.double(u)) \
+u_b = u_0 + 1/2 dot.double(u) t_b^2$
+
+_Existence_: requires
+$dot.double(u) >= 4 (u_f - u_0) / t_f^2$
+
+(else discriminant is negative -- chosen acceleration too small for the linear region to exist).
+
+Piecewise trajectory:
+$
+  u(t) = cases(
+    u_0 + 1/2 dot.double(u) t^2 & t < t_b,
+    (u_h - u_b)/(t_h - t_b) (t - t_b) + u_b quad & t_b <= t < t_f - t_b,
+    u_f - 1/2 dot.double(u) (t_f - t)^2 & t >= t_f - t_b
+  )
+$
+
+=== Multi-Segment Trajectories
+
+Concatenate per-segment trajectories with constant-$u$ dwell intervals between moves. Each segment uses one of the schemes above.
+
 == Manipulator Dynamics
 
 $
