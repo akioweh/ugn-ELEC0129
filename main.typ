@@ -595,21 +595,27 @@ $
 This method, unlike velocity propagation, does not work well for angular velocities... due to math reasons.
 (How do you differentiate a rotation matrix?)
 
-+ obtain the FK function $[x, y, z] = f(q_1, ..., q_n)$
-+ differentiate $f$ wrt. $t$; compute all its partial derivatives $(partial f) / (partial q_i)$
++ obtain the FK function $[x, y, z] = bold(f)(q_1, ..., q_n)$
++ differentiate $f$ wrt. $t$; compute all its partial derivatives $(partial bold(f)) / (partial q_i)$
 + arrange partials in a matrix to obtain (linear-velocity-only) Jacobian $bold(J)_v$
 
 
-$dot(x) = (partial f_x) / (partial q_1) dot(q)_1 + ... + (partial f_x) / (partial q_n) dot(q)_n \
-dot(y) = (partial f_y) / (partial q_1) dot(q)_1 + ... + (partial f_y) / (partial q_n) dot(q)_n \
-dot(z) = (partial f_z) / (partial q_1) dot(q)_1 + ... + (partial f_z) / (partial q_n) dot(q)_n$
+$
+  dot(x) & = (partial f_x) / (partial q_1) dot(q)_1 + ... + (partial f_x) / (partial q_n) dot(q)_n \
+  dot(y) & = (partial f_y) / (partial q_1) dot(q)_1 + ... + (partial f_y) / (partial q_n) dot(q)_n \
+  dot(z) & = (partial f_z) / (partial q_1) dot(q)_1 + ... + (partial f_z) / (partial q_n) dot(q)_n
+$
 
 
 $
-  bold(J)_v = mat((partial f) / (partial q_1), (partial f) / (partial q_2), ..., (partial f) / (partial q_n);) = mat(
-    gradient^top f_x;
-    gradient^top f_y;
-    gradient^top f_z;
+  bold(J)_v = mat(
+    |, |, , |;
+    (partial bold(f)) / (partial q_1), (partial bold(f)) / (partial q_2), ..., (partial bold(f)) / (partial q_n);
+    |, |, , |;
+  ) = mat(
+    <-, gradient^top f_x, ->;
+    <-, gradient^top f_y, ->;
+    <-, gradient^top f_z, ->;
   ) =
   mat(
     (partial f_x) / (partial q_1), (partial f_x) / (partial q_2), ..., (partial f_x) / (partial q_n);
