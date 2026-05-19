@@ -564,4 +564,39 @@ $
 $
 
 #pagebreak()
+= Dynamics and Control
+
+== Trajectory Planning
+
+== Manipulator Dynamics
+
+$
+  M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + g(bold(q)) = bold(tau)
+$
+
+$M(bold(q))$ is an $n times n$ matrix representing the inertial properties; \
+$V(bold(q), dot(bold(q)))$ is an $n$-dim vector representing the Coriolis and centrifugal forces; \
+$g(bold(q))$ is an $n$-dim vector representing gravitational forces.
+
+$M$ is positive-definite and symmetric, and thus invertible. \
+$V$ can be derived from $M$.
+
+*Newton Euler Formula*
+
+$
+  bold(F) & = m dot(bold(v)) \
+        N & = attach(I, tl: c) dot(omega) + omega times attach(I, tl: c) omega \
+$
+
+$attach(I, tl: c)$ is the _inertia tensor_ of the body expressed in the body's center of mass frame ${c}$.
+
+=== Friction
+
+
+$
+  M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + g(bold(q)) = bold(tau) - bold(tau)_f
+$
+where $bold(tau)_f$ is the friction torque, which can be modeled as a function of $bold(q)$ and $dot(bold(q))$.
+
+== Manipulator Control
 
