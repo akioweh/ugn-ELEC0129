@@ -633,10 +633,23 @@ $
   $x = c_1 e^(lambda_1 t) + c_2 e^(lambda_2 t)$
 
 In a control system that models a mass-spring-damper system,
-$k$ acts as the _stiffness_ of the system... \
-If one picks $k$ first, then $b = 2 sqrt(m k)$ achieves critical damping.
+$k_p = k$ acts as the _stiffness_ of the system... \
+For some arbitrary choice of $k_p$, critical damping is achieved by $k_v = b = 2 sqrt(m k_p)$.
 
 Note that this is a PD (proportional-derivative) controller.
 
+=== Control Law Partitioning
 
+One can partition the controller into two parts, a model-based compensator and a servo controller, s.t. the servo controller's parameters are completely independent of the non-design physical parameters.
+
++ Given system dynamics $m dot.double(x) + b dot(x) + k x = F$
++ Design model-based compensator:
+  - delegate highest-order control ($f$): $F = m f + b dot(x) + k x$
+  - system is reduced to unit mass ($dot.double(x) = f$)
++ Design servo controller
+  - $f = -k_v dot(x) - k_p x$
+
+I.e., \
+$m dot.double(x) + b dot(x) + k x = F = m(-k_v dot(x) - k_p x) + b dot(x) + k x \
+dot.double(x) + k_v dot(x) + k_p x = 0$
 
