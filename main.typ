@@ -653,3 +653,18 @@ I.e., \
 $m dot.double(x) + b dot(x) + k x = F = m(-k_v dot(x) - k_p x) + b dot(x) + k x \
 dot.double(x) + k_v dot(x) + k_p x = 0$
 
+=== Nonzero Setpoint
+
+Following a partitioned controllers, the servo controller can be trivially parameterized: \
+$f = -k_v dot(x) + -k_p (x - x_d)$ \
+where $x_d$ is the desired setpoint.
+
+=== Trajectory Following
+
+Once again, only the servo controller changes: \
+$f = dot.double(x)_d -k_v (dot(x) - dot(x)_d) - k_p (x - x_d)$ \
+where $x_d$, $dot(x)_d$, and $dot.double(x)_d$ are the desired position, velocity, and acceleration at the current time step.
+
+Note that if we define the _tracking error_ as $e = x - x_d$, then the closed-loop dynamics of the error is \
+$dot.double(e) + k_v dot(e) + k_p e = 0$ \
+which is a mass-spring-damper system in of itself!
