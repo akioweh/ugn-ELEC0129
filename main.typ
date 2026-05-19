@@ -652,6 +652,12 @@ $
                    bold(tau) & = bold(J)^top bold(F)
 $
 
+Above uses $bold(J)_v$ only -- assumes no end-effector moment.
+For a full wrench $bold(cal(F)) = vec(bold(F), bold(N))$, the $6 times n$ Jacobian is required.
+
+At a singularity, the same duality means certain end-effector forces require _zero_ joint torque (the structure carries them directly through the links).
+E.g. fully extended arm supporting a vertical load.
+
 #pagebreak()
 = Dynamics and Control
 
