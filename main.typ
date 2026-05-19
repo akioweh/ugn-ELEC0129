@@ -241,7 +241,7 @@ $
   mat(
     augment: #(hline: 3, vline: 3),
     , , , ;
-    , #box(height: 0em, baseline: -0.7em, $attach(R, tl: A, bl: B)^T$), , #box(height: 0em, baseline: -0.7em, $attach(R, tl: A, bl: B)^T attach(P, tl: A, br: B_"org")$)
+    , #box(height: 0em, baseline: -0.7em, $attach(R, tl: A, bl: B)^top$), , #box(height: 0em, baseline: -0.7em, $-attach(R, tl: A, bl: B)^top attach(P, tl: A, br: B_"org")$)
     ;
     , , , ;
     0, 0, 0, 1;
