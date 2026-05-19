@@ -860,6 +860,22 @@ E.g. *rectangular block* ($l times w times h$), frame at the centre, axes aligne
 
 $I_(x x) = m/12 (l^2 + h^2), quad I_(y y) = m/12 (w^2 + h^2), quad I_(z z) = m/12 (w^2 + l^2)$
 
+=== Cartesian-Space Dynamics
+
+Premultiply joint-space dynamics by $bold(J)^(-top)$ and use $bold(tau) = bold(J)^top bold(F)$, $dot.double(bold(x)) = bold(J) dot.double(bold(q)) + dot(bold(J)) dot(bold(q))$:
+
+$ M_x dot.double(bold(x)) + V_x + G_x = bold(F) $
+
+where
+
+$M_x = bold(J)^(-top) M bold(J)^(-1) \
+V_x = bold(J)^(-top) (V - M bold(J)^(-1) dot(bold(J)) dot(bold(q))) \
+G_x = bold(J)^(-top) G$
+
+Useful when forces are naturally expressed in task space (e.g. polishing). \
+One may also use the Jacobian expressed in ${e}$  so the force aligns with tool axes regardless of pose: \
+$attach(bold(J)_v, tl: e) = attach(R, tl: e, bl: 0) thin attach(bold(J)_v, tl: 0)$
+
 === Friction
 
 
