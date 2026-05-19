@@ -556,6 +556,40 @@ Quite intuitive; roughly,
 
 This works for both linear and angular velocities.
 
+Start with a static base:
+
+$
+  attach(omega, tl: 0, br: 0) & = 0 \
+      attach(v, tl: 0, br: 0) & = 0
+$
+
+For *revolute* joint $i+1$:
+
+$
+  attach(omega, tl: i+1, br: i+1) = attach(R, tl: i+1, bl: i) thin attach(omega, tl: i, br: i) + dot(theta)_(i+1) hat(Z) \
+  attach(v, tl: i+1, br: i+1) = attach(R, tl: i+1, bl: i) thin (attach(v, tl: i, br: i) + attach(omega, tl: i, br: i) times attach(P, tl: i, br: i+1))
+$
+
+For *prismatic* joint $i+1$:
+
+$
+  attach(omega, tl: i+1, br: i+1) &= attach(R, tl: i+1, bl: i) thin attach(omega, tl: i, br: i) \
+  attach(v, tl: i+1, br: i+1) &= attach(R, tl: i+1, bl: i) thin (attach(v, tl: i, br: i) + attach(omega, tl: i, br: i) times attach(P, tl: i, br: i+1)) + dot(d)_(i+1) hat(Z)
+$
+
+End-effector ${e}$ rigidly attached to ${n}$ at offset $attach(P, tl: n, br: e)$:
+
+$
+  attach(omega, tl: n, br: e) & = attach(omega, tl: n, br: n) \
+      attach(v, tl: n, br: e) & = attach(v, tl: n, br: n) + attach(omega, tl: n, br: n) times attach(P, tl: n, br: e)
+$
+
+Re-express in the base frame:
+$
+      attach(v, tl: 0, br: e) & = attach(R, tl: 0, bl: n) thin attach(v, tl: n, br: e) \
+  attach(omega, tl: 0, br: e) & = attach(R, tl: 0, bl: n) thin attach(omega, tl: n, br: e)
+$
+
 === Direct Differentiation
 
 This method, unlike velocity propagation, does not work well for angular velocities... due to math reasons.
