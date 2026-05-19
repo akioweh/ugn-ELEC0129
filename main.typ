@@ -944,6 +944,8 @@ I.e., \
 $m dot.double(x) + b dot(x) + k x = F = m(-k_v dot(x) - k_p x) + b dot(x) + k x \
 dot.double(x) + k_v dot(x) + k_p x = 0$
 
+Unit-mass removes $m$ from the critical damping condition, so $k_v = 2 sqrt(k_p)$.
+
 === Nonzero Setpoint
 
 Following a partitioned controllers, the servo controller can be trivially parameterized: \
