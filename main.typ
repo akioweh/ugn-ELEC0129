@@ -571,15 +571,15 @@ $
 == Manipulator Dynamics
 
 $
-  M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + g(bold(q)) = bold(tau)
+  M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + G(bold(q)) = bold(tau)
 $
 
-$M(bold(q))$ is an $n times n$ matrix representing the inertial properties; \
+$M(bold(q))$ is an $n times n$ _mass matrix_; \
 $V(bold(q), dot(bold(q)))$ is an $n$-dim vector representing the Coriolis and centrifugal forces; \
-$g(bold(q))$ is an $n$-dim vector representing gravitational forces.
+$G(bold(q))$ is an $n$-dim vector representing gravitational forces.
 
 $M$ is positive-definite and symmetric, and thus invertible. \
-$V$ can be derived from $M$.
+$V$ can be derived from $M$ (but it is complicated and out-of-scope).
 
 *Newton Euler Formula*
 
@@ -594,9 +594,9 @@ $attach(I, tl: c)$ is the _inertia tensor_ of the body expressed in the body's c
 
 
 $
-  M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + g(bold(q)) = bold(tau) - bold(tau)_f
+  M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + G(bold(q)) = bold(tau) - bold(tau)_f
 $
-where $bold(tau)_f$ is the friction torque, which can be modeled as a function of $bold(q)$ and $dot(bold(q))$.
+where $bold(tau)_f$ is the friction forces, which can be modeled as a function of $bold(q)$ and $dot(bold(q))$.
 
 == Manipulator Control
 
