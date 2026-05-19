@@ -371,6 +371,26 @@ $
 
 == Inverse Kinematics
 
+Given desired end-effector pose, find joint parameters.
+Generally non-linear; no general algorithm exists.
+
+=== Existence and Multiplicity
+
+_Workspace_: volume reachable by the end-effector.
+- _Reachable workspace_: all points reachable in at least one orientation.
+- _Dexterous workspace_: subset where all orientations are reachable.
+- Interior points typically admit multiple orientations; boundary points only one.
+- _Joint limits_ shrink workspace volume or reduce orientations per point.
+
+_Multiplicity_: a single target pose often has several IK solutions.
+- Planar RRR: 2 solutions (elbow-up / elbow-down).
+- PUMA 560 (6R): 8 solutions = 4 arm configurations $times$ 2 wrist-flips, where flipping is $theta_4 ' = theta_4 + pi, theta_5 ' = -theta_5, theta_6 ' = theta_6 + pi$.
+- $n > 6$ DOF: infinitely many solutions -- _redundant manipulator_.
+
+Multiple solutions are useful for collision avoidance; the controller must still pick one (heuristic: smallest joint movement from current configuration).
+
+Solution methods: _closed-form_ (algebraic or geometric) and _numerical_.
+Only closed-form is in scope.
 === Algebraic Solution to Planar RRR
 
 For a planar RRR robot, we have
