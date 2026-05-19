@@ -308,7 +308,7 @@ Frame axis assignment:
 The origin of the frame ${i}_"org"$ is of course the intersection point of $z_i$ and $x_i$.
 
 One consequential property of the placement rules is that $x_i$ intersects and is perpendicular to $z_(i+1)$ (and $z_i$).
-Also, $z_i$ collinear to the common normal between $x_(i-1)$ and $x_i$, just like how $x$ axes are to $z$ axes.
+Also, $z_i$ is collinear to the common normal between $x_(i-1)$ and $x_i$, just like how $x$ axes are to $z$ axes.
 
 ==== Conventions/Tips
 
@@ -339,12 +339,12 @@ After the frames are placed, the transformation $T_i$ from ${i-1}$ to ${i}$ can 
   //
   [Link length],
   $a_(i-1)$,
-  [distance from $z_(i-1)$ to $z_i$ (along $x_(i-1))$],
+  [distance from $z_(i-1)$ to $z_i$ (along $x_(i-1)$)],
   $frac(style: "horizontal", abs((P_i - P_(i-1)) dot (hat(z)_(i-1) times hat(z)_i)), norm(hat(z)_(i-1) times hat(z)_i))$,
 
   [Link twist],
   $alpha_(i-1)$,
-  [angle from $z_(i-1)$ to $z_i$ (about $x_(i-1))$],
+  [angle from $z_(i-1)$ to $z_i$ (about $x_(i-1)$)],
   $op("atan2")((hat(z)_(i-1) times hat(z)_i) dot hat(x)_(i-1), hat(z)_(i-1) dot hat(z)_i)$,
 
   [Joint offset], $d_i$, [distance from $x_(i-1)$ to $x_i$ along $z_i$], [displacement, if prismatic],
@@ -395,6 +395,12 @@ Only closed-form is in scope.
 === Geometric Solution to Planar RRR
 
 For a 3-link planar manipulator (link lengths $L_1, L_2, L_3$) reaching ${3}$-frame pose $(x, y, phi)$, solve via the base–elbow–wrist triangle.
+
+#aside[
+  Given a desired end-effector pose $(x_e, y_e, phi)$, back off by $L_3$ along the EE's orientation to get the wrist target:
+  $x = x_e - L_3 cos phi, quad y = y_e - L_3 sin phi$ \
+  $phi$ is unchanged since link 3 is rigidly oriented with ${3}$.
+]
 
 *1. $theta_2$*
 
@@ -519,24 +525,16 @@ We have two main methods to compute the Jacobian of a FK function: velocity prop
 
 ==== Notation
 
-_Absolute_ angular velocity of ${i}$ (wrt. ${0}$): $omega_i$.
+Absolute (wrt. ${0}$) angular velocity of ${i}$: $omega_i$.
 
-_Relative_ angular velocity of ${i}$ (wrt. ${i-1}$; i.e., angular velocity of joint $i$): $Omega_i$.
+Absolute (wrt. ${0}$) linear velocity of ${i}$: $v_i$.
 
-_Absolute_ linear velocity of ${i}$ (wrt. ${0}$): $v_i$.
-
-Note that $Omega$ always denotes a velocity relative to the directly preceding frame.
-
-All of these measures, as usual, can be expressed in any frame, e.g. $attach(omega, tl: A, br: i)$. \
-Without a TL-script, absolute velocities are implicitly expressed in the base frame ${0}$.
+These measures, as usual, can be expressed in any frame, e.g. $attach(omega, tl: A, br: i)$. \
+Without a TL-script, the frame of expression is implicitly ${0}$.
 
 Angular velocity is represented as a vector; direction is axis and magnitude is speed.
 
 Note that the cross-product $omega times P$ gives the tangential linear velocity at $P$ due to $w$.
-
-// $omega_i eq.delta attach(Omega, tl: 0, br: i) = attach(R, tl: 0, bl: i-1) thick attach(Omega, tl: i-1, br: i)$
-
-$attach(v, tl: i, br: i+1) eq.def dif/(dif t) (attach(P, tl: i, br: i+1))$
 
 Generalized joint parameter (represents either $theta$ or $d$): $q_i$
 
@@ -592,8 +590,9 @@ $
 
 === Direct Differentiation
 
-This method, unlike velocity propagation, does not work well for angular velocities... due to math reasons.
-(How do you differentiate a rotation matrix?)
+#aside[
+  This method, unlike velocity propagation, does not work well for angular velocities -- differentiating a rotation matrix is technically possible ($dot(R) = [omega]_times R$) but extracting the angular Jacobian column-by-column this way is painful.
+]
 
 + obtain the FK function $[x, y, z] = bold(f)(q_1, ..., q_n)$
 + differentiate $f$ wrt. $t$; compute all its partial derivatives $(partial bold(f)) / (partial q_i)$
@@ -858,7 +857,7 @@ _Principal axes_: a frame orientation for which all products of inertia vanish; 
 
 E.g. *rectangular block* ($l times w times h$), frame at the centre, axes aligned with edges (all products vanish by symmetry):
 
-$I_(x x) = m/12 (l^2 + h^2), quad I_(y y) = m/12 (w^2 + h^2), quad I_(z z) = m/12 (w^2 + l^2)$
+$I_(x x) = m/12 (w^2 + h^2), quad I_(y y) = m/12 (l^2 + h^2), quad I_(z z) = m/12 (l^2 + w^2)$
 
 === Cartesian-Space Dynamics
 
@@ -948,8 +947,8 @@ Unit-mass removes $m$ from the critical damping condition, so $k_v = 2 sqrt(k_p)
 
 === Nonzero Setpoint
 
-Following a partitioned controllers, the servo controller can be trivially parameterized: \
-$f = -k_v dot(x) + -k_p (x - x_d)$ \
+Following a partitioned controller, the servo controller can be trivially parameterized: \
+$f = -k_v dot(x) - k_p (x - x_d)$ \
 where $x_d$ is the desired setpoint.
 
 === Trajectory Following
@@ -1017,7 +1016,7 @@ A model-based compensator could _also_ isolate individual joints in a multi-join
 
 Take the manipulator dynamics model $bold(tau) = M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + G(bold(q))$
 - $bold(tau) = M(bold(q)) bold(f) + V(bold(q), dot(bold(q))) + G(bold(q))$
-- $bold(f) = dot.double(bold(q))_d - K_v (dot(bold(q)) - dot(bold(q)_d)) - K_p (bold(q) - bold(q)_d)$
+- $bold(f) = dot.double(bold(q))_d - K_v (dot(bold(q)) - dot(bold(q))_d) - K_p (bold(q) - bold(q)_d)$
 
 note that $K_v$ and $K_p$ are now matrices, but they are diagonal for decoupled control:
 
