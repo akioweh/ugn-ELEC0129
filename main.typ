@@ -76,7 +76,7 @@ Aka. fixed-angle representation.
   Modern terminology calls this _extrinsic_ Euler angles.
 ]
 
-For XYZ $->$ $alpha$ $beta$ $gamma$:
+For XYZ $->$ $gamma$ $beta$ $alpha$:
 
 $R = R_Z (alpha) R_Y (beta) R_X (gamma)$
 
