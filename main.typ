@@ -717,3 +717,32 @@ $
       & = R_a (tau / (k_m eta)) + k_e eta dot(theta)
 $
 A function of voltage in terms of velocity and desired torque.
+
+=== Multi-joint Control
+
+A model-based compensator could _also_ isolate individual joints in a multi-joint system!
+
+Take the manipulator dynamics model $bold(tau) = M(bold(q)) dot.double(bold(q)) + V(bold(q), dot(bold(q))) + G(bold(q))$
+- $bold(tau) = M(bold(q)) bold(f) + V(bold(q), dot(bold(q))) + G(bold(q))$
+- $bold(f) = dot.double(bold(q))_d - K_v (dot(bold(q)) - dot(bold(q)_d)) - K_p (bold(q) - bold(q)_d)$
+
+note that $K_v$ and $K_p$ are now matrices, but they are diagonal for decoupled control:
+
+$
+  vec(f_1, f_2, dots.v, f_n) =
+  vec(dot.double(q)_1, dot.double(q)_2, ..., dot.double(q)_n) -
+  mat(
+    k_(v 1), 0, ..., 0;
+    0, k_(v 2), ..., 0;
+    dots.v, dots.v, dots.down, dots.v;
+    0, 0, ..., k_(v n)
+  )
+  vec(dot(q)_1 - dot(q)_(d 1), dot(q)_2 - dot(q)_(d 2), ..., dot(q)_n - dot(q)_(d n)) -
+  mat(
+    k_(p 1), 0, ..., 0;
+    0, k_(p 2), ..., 0;
+    dots.v, dots.v, dots.down, dots.v;
+    0, 0, ..., k_(p n)
+  )
+  vec(q_1 - q_(d 1), q_2 - q_(d 2), dots.v, q_n - q_(d n))
+$
